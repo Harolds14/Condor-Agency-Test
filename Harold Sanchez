@@ -1,0 +1,69 @@
+from itertools import permutations
+import sympy
+
+def reorder_phone_numbers(vector):
+    unique_numbers = list(set(vector))
+    
+    number_permutations = permutations(unique_numbers)
+    
+    valid_combinations = []
+    
+    for permutation in number_permutations:
+        reordered_vector = []
+        found_8 = False
+        found_9 = False
+        found_divisible_pair = False
+        
+        for num in permutation:
+            count = vector.count(num)
+            
+            if num == 8:
+                reordered_vector.extend([num] * count)
+                found_8 = True
+            elif num == 9:
+                if found_9:
+                    # If another 9 is found, skip this permutation
+                    break
+                
+                reordered_vector.extend([num] * count)
+                found_9 = True
+            else:
+                if count >= 2:
+                    # Find two different numbers each appearing twice
+                    reordered_vector.extend([num, num])
+                    found_divisible_pair = True
+        
+        if found_8 and found_9 and found_divisible_pair:
+            
+            threes_indices = [i for i, num in enumerate(vector) if num == 3]
+            
+            if len(threes_indices) > 0:
+                same_number = vector[threes_indices[0] - 1]
+                reordered_vector.extend([same_number, 3, same_number])
+            else:
+      
+                continue
+            
+            if vector[4] % vector[5] == 0 and vector[4] % vector[6] == 0:
+                reordered_vector.extend(vector[4:7])
+            else:
+                continue
+            if vector[-2] % vector[-1] == 0:
+                reordered_vector.extend(vector[-2:])
+            else:
+                continue
+            
+            if sympy.isprime(vector[-1]):
+                reordered_vector.append(vector[-1])
+            else:
+                continue
+            
+            valid_combinations.append(reordered_vector)
+    
+    return valid_combinations
+
+
+vector = [0, 0, 2, 2, 3, 4, 4, 8, 8, 9, 9]
+combinations = reorder_phone_numbers(vector)
+for combination in combinations:
+    print(combination)
